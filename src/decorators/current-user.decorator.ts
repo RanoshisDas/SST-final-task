@@ -1,6 +1,8 @@
-import {createParamDecorator, ExecutionContext, Injectable} from "@nestjs/common";
+import { createParamDecorator, ExecutionContext } from "@nestjs/common";
 
-export const CurrentUser=
-    createParamDecorator((data:never,req: ExecutionContext)=> {
-        return req.switchToHttp().getRequest().currentUser;
-    });
+export const CurrentUser = createParamDecorator(
+    (data: never, context: ExecutionContext) => {
+        const request = context.switchToHttp().getRequest();
+        return request.user;
+    }
+);

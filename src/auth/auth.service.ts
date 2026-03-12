@@ -34,7 +34,7 @@ export class AuthService {
             password
         );
 
-        const token=this.generateToken(newUser.id);
+        const token=this.generateToken(newUser);
 
         return {
             ...token,
@@ -56,8 +56,7 @@ export class AuthService {
         if (dbHash !== hash.toString('hex')) {
             throw new UnauthorizedException('Wrong email or password');
         }
-        const UserId=user.id;
-        const token=this.jwtService.sign({UserId},{expiresIn:'2Days'})
+        const token=this.generateToken(user);
 
         return {
             token,
@@ -65,10 +64,11 @@ export class AuthService {
         };
     }
 
-    private generateToken(userId:number) {
+    private generateToken(user:User) {
 
+        const payload = { email: user.email, id: user.id, name: user.name};
         return {
-            access_token: this.jwtService.sign({userId}, {expiresIn: '1Day'})
+            access_token: this.jwtService.sign(payload, {expiresIn: '1Day'})
         };
     }
 }

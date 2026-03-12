@@ -16,7 +16,7 @@ export class TaskOwnerGuard implements CanActivate {
 
         const request = context.switchToHttp().getRequest();
 
-        const user = request.currentUser;
+        const user = request.user;
         const taskId = request.params.id;
 
         const task = await this.tasksService.getTaskById(taskId);

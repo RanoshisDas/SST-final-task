@@ -1,10 +1,8 @@
 import {
-    BadRequestException,
     Body,
     Controller,
     Delete,
     Get,
-    NotFoundException,
     Param,
     Patch, Query,
     Session,
@@ -14,13 +12,13 @@ import {UsersService} from "./users.service";
 import {Serialize} from "../interceptors/serialize.interceptor";
 import {UserDto} from "../dtos/user.dto";
 import {UpdateUserDto} from "../dtos/update-user.dto";
-import {AuthGuard} from "../guard/auth.guard";
-import {CurrentUser} from "../decorators/current-user.decorator";
-import {ApiBody} from "@nestjs/swagger";
+import {ApiBearerAuth, ApiBody} from "@nestjs/swagger";
+import {JwtAuthGuard} from "../guard/jwt.guard";
 
 @Controller('users')
 @Serialize(UserDto)
-@UseGuards(AuthGuard)
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 export class UsersController {
     constructor(private usersService: UsersService) {}
 

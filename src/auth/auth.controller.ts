@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Post, Session, UseGuards} from '@nestjs/common';
+import {Body, Controller, Get, Post, Req, Session, UseGuards} from '@nestjs/common';
 import {CreateUserDto} from "../dtos/create-user.dto";
 import {AuthService} from "./auth.service";
 import {Serialize} from "../interceptors/serialize.interceptor";
@@ -37,7 +37,7 @@ export class AuthController {
     @Get('whoami')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
-    whoAmI(@CurrentUser()user:UserDto){
+    whoAmI(@CurrentUser() user: UserDto) {
         return user;
     }
 
