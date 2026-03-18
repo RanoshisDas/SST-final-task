@@ -1,4 +1,4 @@
-import {Injectable, NotFoundException, UnauthorizedException} from '@nestjs/common';
+import {Injectable, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from "@nestjs/typeorm";
 import {Task, TaskStatus} from "./task.entity";
 import {Repository} from "typeorm";
@@ -59,6 +59,35 @@ export class TasksService {
        });
     }
 
+    getDueTask(userId: number) {
+        return this.taskRepository
+            .createQueryBuilder('task')
+            .leftJoinAndSelect('task.user', 'user')
+            .where('user.id = :userId', { userId })
+            .andWhere('task.dueDate < :today', { today: new Date() })
+            .andWhere('task.status != :completed', { completed: TaskStatus.COMPLETED })
+            .getMany();
+    }
+
+    getStats(userId: number) {
+        return this.taskRepository
+            .createQueryBuilder('task')
+            .select('task.status, COUNT(task.id) as count')
+            .where('task.userId = :userId', { userId })
+            .groupBy('task.status')
+            .getRawMany();
+    }
+
+    async bulkUpdateStatus(taskIds: number[], status: TaskStatus) {
+        const result = await this.taskRepository.update(taskIds, { status });
+
+        if (result.affected === 0) {
+            throw new NotFoundException("No tasks found to update");
+        }
+
+        return {totalTasksUpdated : result.affected};
+    }
+
     async updateTask(id: number, attrs: Partial<Task>) {
         const task = await this.taskRepository.findOne({
             where: { id }, relations: {user: true,},
@@ -68,6 +97,24 @@ export class TasksService {
             throw new NotFoundException('Task not found');
         }
         Object.assign(task, attrs);
+        return this.taskRepository.save(task);
+    }
+
+    async taskComplete(id: number) {
+        const task = await this.taskRepository.findOne({where: {id}, relations: ['user']});
+        if (!task) {
+            throw new NotFoundException('Task not found');
+        }
+        task.status = TaskStatus.COMPLETED;
+        return this.taskRepository.save(task);
+    }
+
+    async taskInProcess(id: number) {
+        const task = await this.taskRepository.findOne({where: {id}, relations: ['user']});
+        if (!task) {
+            throw new NotFoundException('Task not found');
+        }
+        task.status = TaskStatus.IN_PROGRESS;
         return this.taskRepository.save(task);
     }
 
