@@ -78,6 +78,12 @@ export class TasksService {
             .getRawMany();
     }
 
+    getTaskLike(search:string){
+        return this.taskRepository.createQueryBuilder("task")
+            .where("task.title LIKE :search",{search:`%${search}%`})
+            .getMany()
+    }
+
     async bulkUpdateStatus(taskIds: number[], status: TaskStatus) {
         const result = await this.taskRepository.update(taskIds, { status });
 

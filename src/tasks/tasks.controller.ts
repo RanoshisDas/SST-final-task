@@ -48,6 +48,11 @@ export class TasksController {
         return this.tasksService.getAllTask(s.userId);
     }
 
+    @Get('search')
+    searchTask(@Query('search') search:string){
+        return this.tasksService.getTaskLike(search);
+    }
+
     @Get()
     getTasks(@Query() query: TaskQueryDto) {
         return this.tasksService.getTasks(query);

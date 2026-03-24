@@ -4,7 +4,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import {User} from "./user.entity";
 import { UsersService } from './users.service';
 import {CurrentUserMiddleware} from '../middlewares/current-user.middleware'
-import {LoggerMiddleware} from "../decorators/logger.middleware";
 
 @Module({
     imports: [
@@ -20,6 +19,6 @@ export class UsersModule {
             .apply(CurrentUserMiddleware)
             .forRoutes('*');
 
-        consumer.apply(LoggerMiddleware).forRoutes("*")
+        // consumer.apply(LoggerMiddleware).forRoutes("*")
     }
 }
